@@ -1,4 +1,4 @@
-# java-kaf# java-kafka-home-app
+# java-kafka-home-app
 
 Domowa aplikacja do planowania obowiązków dla rodziny (multi-user).
 Projekt edukacyjny: Java 21, Spring Boot, Apache Kafka, Docker, GitHub Actions.
@@ -30,4 +30,4 @@ Typy: `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`, `build`.
 
 - JDK 21
 - Docker Desktop
-- Gitka-home-app
+- Git
