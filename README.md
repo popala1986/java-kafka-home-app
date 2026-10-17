@@ -31,3 +31,12 @@ Typy: `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`, `build`.
 - JDK 21
 - Docker Desktop
 - Git
+
+
+## Uruchomienie lokalne
+
+1. Skopiuj `.env.example` jako `.env` i ustaw hasło do bazy.
+2. Uruchom infrastrukturę: `docker compose up -d`
+3. Kafka UI: http://localhost:8080
+4. Kafka dla aplikacji: `localhost:9092`, PostgreSQL: `localhost:5432` (bazy: `auth_db`, `planner_db`, `notification_db`)
+5. Zatrzymanie: `docker compose down` (z usunięciem danych: `docker compose down -v`)
