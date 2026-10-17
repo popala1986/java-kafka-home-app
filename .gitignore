@@ -1,0 +1,34 @@
+# --- Maven ---
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# --- VS Code ---
+.vscode/
+
+# --- Logi ---
+*.log
+logs/
+
+# --- Sekrety i zmienne lokalne (NIGDY nie commitujemy) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- System ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Docker (lokalne dane) ---
+docker-data/
