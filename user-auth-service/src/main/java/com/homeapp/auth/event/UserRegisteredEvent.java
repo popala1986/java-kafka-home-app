@@ -7,6 +7,8 @@ import java.util.UUID;
 public record UserRegisteredEvent(
     UUID eventId,
     UUID userId,
+    UUID householdId,
+    String role,
     String email,
     String firstName,
     LocalDate birthDate,
