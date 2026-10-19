@@ -11,6 +11,10 @@ import jakarta.validation.constraints.Size;
 
 public record RegisterUserRequest(
 
+    @NotBlank(message = "Nazwa rodziny jest wymagana")
+    @Size(max = 100, message = "Nazwa rodziny może mieć maksymalnie 100 znaków")
+    String householdName,
+
     @NotBlank(message = "Email jest wymagany")
     @Email(message = "Niepoprawny format emaila")
     @Size(max = 255)

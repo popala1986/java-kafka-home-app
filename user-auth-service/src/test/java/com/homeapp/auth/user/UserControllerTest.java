@@ -21,6 +21,17 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(UserController.class)
 class UserControllerTest {
 
+    private static final String VALID_BODY = """
+            {
+              "householdName": "Kowalscy",
+              "email": "jan@example.com",
+              "password": "Haslo123!",
+              "firstName": "Jan",
+              "birthDate": "1986-05-20",
+              "phoneNumber": "+48600100200"
+            }
+            """;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -28,28 +39,20 @@ class UserControllerTest {
     private UserService userService;
 
     @Test
-    void shouldRegisterUser() throws Exception {
+    void shouldRegisterUserAsHouseholdAdmin() throws Exception {
+        UUID householdId = UUID.randomUUID();
         UserResponse response = new UserResponse(
-            UUID.randomUUID(), "jan@example.com", "Jan",
-            LocalDate.of(2011, 5, 20), "+48600100200", Role.USER, Instant.now());
+            UUID.randomUUID(), householdId, "jan@example.com", "Jan",
+            LocalDate.of(1986, 5, 20), "+48600100200", Role.ADMIN, true, Instant.now());
         given(userService.register(any())).willReturn(response);
-
-        String body = """
-                {
-                  "email": "jan@example.com",
-                  "password": "Haslo123!",
-                  "firstName": "Jan",
-                  "birthDate": "2011-05-20",
-                  "phoneNumber": "+48600100200"
-                }
-                """;
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
+                .content(VALID_BODY))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.email").value("jan@example.com"))
-            .andExpect(jsonPath("$.role").value("USER"))
+            .andExpect(jsonPath("$.role").value("ADMIN"))
+            .andExpect(jsonPath("$.householdId").value(householdId.toString()))
             .andExpect(jsonPath("$.password").doesNotExist());
     }
 
@@ -68,6 +71,7 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
             .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errors.householdName").exists())
             .andExpect(jsonPath("$.errors.email").exists())
             .andExpect(jsonPath("$.errors.password").exists())
             .andExpect(jsonPath("$.errors.firstName").exists())
@@ -81,19 +85,9 @@ class UserControllerTest {
     void shouldReturn409WhenEmailIsTaken() throws Exception {
         given(userService.register(any())).willThrow(new EmailAlreadyTakenException("jan@example.com"));
 
-        String body = """
-                {
-                  "email": "jan@example.com",
-                  "password": "Haslo123!",
-                  "firstName": "Jan",
-                  "birthDate": "2011-05-20",
-                  "phoneNumber": "+48600100200"
-                }
-                """;
-
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
+                .content(VALID_BODY))
             .andExpect(status().isConflict());
     }
 }

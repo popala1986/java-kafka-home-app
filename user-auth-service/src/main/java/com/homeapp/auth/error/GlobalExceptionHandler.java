@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.homeapp.auth.household.HouseholdNotFoundException;
 import com.homeapp.auth.user.EmailAlreadyTakenException;
 
 @RestControllerAdvice
@@ -31,6 +32,13 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleEmailTaken(EmailAlreadyTakenException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
         problem.setTitle("Email zajęty");
+        return problem;
+    }
+
+    @ExceptionHandler(HouseholdNotFoundException.class)
+    public ProblemDetail handleHouseholdNotFound(HouseholdNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Nie znaleziono rodziny");
         return problem;
     }
 }

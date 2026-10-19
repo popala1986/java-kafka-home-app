@@ -26,6 +26,8 @@ public class UserEventPublisher {
         UserRegisteredEvent event = new UserRegisteredEvent(
             UUID.randomUUID(),
             user.getId(),
+            user.getHousehold().getId(),
+            user.getRole().name(),
             user.getEmail(),
             user.getFirstName(),
             user.getBirthDate(),
