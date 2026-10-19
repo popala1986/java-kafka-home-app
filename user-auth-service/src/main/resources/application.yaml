@@ -28,6 +28,12 @@ spring:
       properties:
         spring.json.add.type.headers: false
 
+app:
+  jwt:
+    # Lokalnie działa wartość domyślna. Na serwerze podamy prawdziwy sekret w zmiennej JWT_SECRET.
+    secret: ${JWT_SECRET:local-dev-secret-change-me-at-least-32-bytes-long}
+    expiration: ${JWT_EXPIRATION:PT1H}
+
 management:
   endpoints:
     web:

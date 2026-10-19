@@ -85,6 +85,13 @@ public class UserService {
             .toList();
     }
 
+    @Transactional(readOnly = true)
+    public UserResponse getUser(UUID userId) {
+        return userRepository.findById(userId)
+            .map(UserResponse::from)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
     private UserResponse saveAndPublish(User user) {
         User saved = userRepository.save(user);
         userEventPublisher.publishUserRegistered(saved);
