@@ -10,6 +10,10 @@ public final class CurrentUser {
     private CurrentUser() {
     }
 
+    public static UUID userId(Jwt jwt) {
+        return UUID.fromString(jwt.getSubject());
+    }
+
     public static UUID householdId(Jwt jwt) {
         return UUID.fromString(jwt.getClaimAsString("householdId"));
     }

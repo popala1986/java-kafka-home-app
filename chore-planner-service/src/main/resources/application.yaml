@@ -35,6 +35,10 @@ app:
   jwt:
     # Ten sam sekret co w user-auth-service: planner sprawdza podpis tokenu wydanego przez auth.
     secret: ${JWT_SECRET:local-dev-secret-change-me-at-least-32-bytes-long}
+  planner:
+    # Kiedy automat układa plan na następny tydzień: sekunda minuta godzina dzień miesiąc dzień-tygodnia.
+    # Tu: w każdą niedzielę o 18:00 (strefa Europe/Warsaw).
+    weekly-plan-cron: ${WEEKLY_PLAN_CRON:0 0 18 * * SUN}
 
 management:
   endpoints:
