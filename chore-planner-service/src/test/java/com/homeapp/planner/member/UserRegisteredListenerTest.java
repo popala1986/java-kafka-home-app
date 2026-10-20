@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -12,10 +13,13 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import com.homeapp.planner.chore.ChoreService;
+
 class UserRegisteredListenerTest {
 
     private final HouseholdMemberRepository repository = mock(HouseholdMemberRepository.class);
-    private final UserRegisteredListener listener = new UserRegisteredListener(repository);
+    private final ChoreService choreService = mock(ChoreService.class);
+    private final UserRegisteredListener listener = new UserRegisteredListener(repository, choreService);
 
     private UserRegisteredEvent event(UUID householdId) {
         return new UserRegisteredEvent(
@@ -31,6 +35,7 @@ class UserRegisteredListenerTest {
         listener.onUserRegistered(event, 0, 0L);
 
         verify(repository).save(any(HouseholdMember.class));
+        verify(choreService).addDefaultChoresIfMissing(event.householdId());
     }
 
     @Test
@@ -41,6 +46,7 @@ class UserRegisteredListenerTest {
         listener.onUserRegistered(event, 0, 0L);
 
         verify(repository, never()).save(any());
+        verifyNoInteractions(choreService);
     }
 
     @Test

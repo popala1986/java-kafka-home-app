@@ -8,15 +8,19 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import com.homeapp.planner.chore.ChoreService;
+
 @Component
 public class UserRegisteredListener {
 
     private static final Logger log = LoggerFactory.getLogger(UserRegisteredListener.class);
 
     private final HouseholdMemberRepository memberRepository;
+    private final ChoreService choreService;
 
-    public UserRegisteredListener(HouseholdMemberRepository memberRepository) {
+    public UserRegisteredListener(HouseholdMemberRepository memberRepository, ChoreService choreService) {
         this.memberRepository = memberRepository;
+        this.choreService = choreService;
     }
 
     @KafkaListener(topics = "user.registered")
@@ -40,5 +44,8 @@ public class UserRegisteredListener {
 
         memberRepository.save(HouseholdMember.from(event));
         log.info("Zapisano domownika {} w rodzinie {}", event.firstName(), event.householdId());
+
+        // Pierwszy domownik nowej rodziny (zwykle admin) = rodzina dostaje startową listę obowiązków.
+        choreService.addDefaultChoresIfMissing(event.householdId());
     }
 }

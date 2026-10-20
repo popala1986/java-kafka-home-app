@@ -31,6 +31,11 @@ spring:
         spring.json.value.default.type: com.homeapp.planner.member.UserRegisteredEvent
         spring.json.use.type.headers: false
 
+app:
+  jwt:
+    # Ten sam sekret co w user-auth-service: planner sprawdza podpis tokenu wydanego przez auth.
+    secret: ${JWT_SECRET:local-dev-secret-change-me-at-least-32-bytes-long}
+
 management:
   endpoints:
     web:
