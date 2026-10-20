@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/auth/ping", "/actuator/health/**", "/actuator/info").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/households/me/members").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/households/me/members/*").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();

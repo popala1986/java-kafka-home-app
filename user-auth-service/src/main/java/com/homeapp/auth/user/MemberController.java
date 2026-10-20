@@ -1,12 +1,15 @@
 package com.homeapp.auth.user;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -38,5 +41,12 @@ public class MemberController {
     @GetMapping
     public List<UserResponse> listMembers(@AuthenticationPrincipal Jwt jwt) {
         return userService.listMembers(CurrentUser.householdId(jwt));
+    }
+
+    @PutMapping("/{userId}")
+    public UserResponse updateMember(@AuthenticationPrincipal Jwt jwt,
+                                     @PathVariable UUID userId,
+                                     @Valid @RequestBody UpdateMemberRequest request) {
+        return userService.updateMember(CurrentUser.householdId(jwt), userId, request);
     }
 }

@@ -75,6 +75,17 @@ public class UserService {
         return saveAndPublish(member);
     }
 
+    /** Admin zmienia imię, datę urodzenia i telefon domownika ze swojej rodziny. */
+    @Transactional
+    public UserResponse updateMember(UUID householdId, UUID userId, UpdateMemberRequest request) {
+        User member = userRepository.findByIdAndHouseholdId(userId, householdId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+
+        member.updateProfile(request.firstName().trim(), request.birthDate(), request.phoneNumber());
+        userEventPublisher.publishUserUpdated(member);
+        return UserResponse.from(member);
+    }
+
     @Transactional(readOnly = true)
     public List<UserResponse> listMembers(UUID householdId) {
         if (!householdRepository.existsById(householdId)) {
