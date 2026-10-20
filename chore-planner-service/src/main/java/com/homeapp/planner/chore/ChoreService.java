@@ -10,16 +10,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.homeapp.planner.member.HouseholdMemberRepository;
+import com.homeapp.planner.member.MemberNotFoundException;
+
 @Service
 public class ChoreService {
 
     private static final Logger log = LoggerFactory.getLogger(ChoreService.class);
 
     private final ChoreRepository choreRepository;
+    private final ChoreExclusionRepository exclusionRepository;
+    private final HouseholdMemberRepository memberRepository;
     private final Clock clock;
 
-    public ChoreService(ChoreRepository choreRepository, Clock clock) {
+    public ChoreService(ChoreRepository choreRepository, ChoreExclusionRepository exclusionRepository,
+                        HouseholdMemberRepository memberRepository, Clock clock) {
         this.choreRepository = choreRepository;
+        this.exclusionRepository = exclusionRepository;
+        this.memberRepository = memberRepository;
         this.clock = clock;
     }
 
@@ -62,6 +70,36 @@ public class ChoreService {
         }
         int copied = choreRepository.copyTemplatesToHousehold(householdId);
         log.info("Rodzina {} dostała {} startowych obowiązków", householdId, copied);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UUID> listExcludedMembers(UUID householdId, UUID choreId) {
+        findChore(householdId, choreId);
+        return exclusionRepository.findAllByChoreId(choreId).stream()
+            .map(ChoreExclusion::getUserId)
+            .toList();
+    }
+
+    // Wyłącz obowiązek jednej osobie. Drugie wywołanie niczego nie psuje (idempotentne).
+    @Transactional
+    public void excludeMember(UUID householdId, UUID choreId, UUID userId) {
+        findChore(householdId, choreId);
+        findMember(householdId, userId);
+        if (!exclusionRepository.existsByChoreIdAndUserId(choreId, userId)) {
+            exclusionRepository.save(new ChoreExclusion(choreId, userId));
+        }
+    }
+
+    @Transactional
+    public void includeMember(UUID householdId, UUID choreId, UUID userId) {
+        findChore(householdId, choreId);
+        findMember(householdId, userId);
+        exclusionRepository.deleteByChoreIdAndUserId(choreId, userId);
+    }
+
+    private void findMember(UUID householdId, UUID userId) {
+        memberRepository.findByUserIdAndHouseholdId(userId, householdId)
+            .orElseThrow(() -> new MemberNotFoundException(userId));
     }
 
     private Chore findChore(UUID householdId, UUID choreId) {

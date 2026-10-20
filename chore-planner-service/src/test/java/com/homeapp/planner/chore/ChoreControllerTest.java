@@ -8,6 +8,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -126,6 +128,27 @@ class ChoreControllerTest {
     @Test
     void userShouldNotDeleteChore() throws Exception {
         mockMvc.perform(delete("/api/planner/chores/{id}", UUID.randomUUID()).with(loggedInAs("USER")))
+            .andExpect(status().isForbidden());
+
+        verifyNoInteractions(choreService);
+    }
+
+    @Test
+    void adminShouldExcludeMemberFromChore() throws Exception {
+        UUID choreId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        mockMvc.perform(put("/api/planner/chores/{choreId}/exclusions/{userId}", choreId, userId)
+                .with(loggedInAs("ADMIN")))
+            .andExpect(status().isNoContent());
+
+        verify(choreService).excludeMember(HOUSEHOLD_ID, choreId, userId);
+    }
+
+    @Test
+    void userShouldNotExcludeMemberFromChore() throws Exception {
+        mockMvc.perform(put("/api/planner/chores/{choreId}/exclusions/{userId}", UUID.randomUUID(), UUID.randomUUID())
+                .with(loggedInAs("USER")))
             .andExpect(status().isForbidden());
 
         verifyNoInteractions(choreService);

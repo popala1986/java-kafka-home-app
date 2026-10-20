@@ -60,4 +60,24 @@ public class ChoreController {
     public void deleteChore(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID choreId) {
         choreService.deleteChore(CurrentUser.householdId(jwt), choreId);
     }
+
+    // Kto NIE robi tego obowiązku (lista userId).
+    @GetMapping("/{choreId}/exclusions")
+    public List<UUID> listExclusions(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID choreId) {
+        return choreService.listExcludedMembers(CurrentUser.householdId(jwt), choreId);
+    }
+
+    @PutMapping("/{choreId}/exclusions/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excludeMember(@AuthenticationPrincipal Jwt jwt,
+                              @PathVariable UUID choreId, @PathVariable UUID userId) {
+        choreService.excludeMember(CurrentUser.householdId(jwt), choreId, userId);
+    }
+
+    @DeleteMapping("/{choreId}/exclusions/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void includeMember(@AuthenticationPrincipal Jwt jwt,
+                              @PathVariable UUID choreId, @PathVariable UUID userId) {
+        choreService.includeMember(CurrentUser.householdId(jwt), choreId, userId);
+    }
 }

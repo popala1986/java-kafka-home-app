@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.homeapp.planner.chore.ChoreNotFoundException;
+import com.homeapp.planner.member.MemberNotFoundException;
+import com.homeapp.planner.plan.AssignmentNotFoundException;
+import com.homeapp.planner.plan.InvalidWeekStartException;
+import com.homeapp.planner.plan.PlanAlreadyExistsException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,6 +35,34 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleChoreNotFound(ChoreNotFoundException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problem.setTitle("Nie znaleziono obowiązku");
+        return problem;
+    }
+
+    @ExceptionHandler(MemberNotFoundException.class)
+    public ProblemDetail handleMemberNotFound(MemberNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Nie znaleziono domownika");
+        return problem;
+    }
+
+    @ExceptionHandler(AssignmentNotFoundException.class)
+    public ProblemDetail handleAssignmentNotFound(AssignmentNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Nie znaleziono zadania");
+        return problem;
+    }
+
+    @ExceptionHandler(InvalidWeekStartException.class)
+    public ProblemDetail handleInvalidWeekStart(InvalidWeekStartException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Zły początek tygodnia");
+        return problem;
+    }
+
+    @ExceptionHandler(PlanAlreadyExistsException.class)
+    public ProblemDetail handlePlanAlreadyExists(PlanAlreadyExistsException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Plan już istnieje");
         return problem;
     }
 }
