@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/planner/plans/*").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/planner/plans/*").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/planner/plans/*/assignments/*").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/planner/digests/*").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();
