@@ -9,10 +9,19 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopicConfig {
 
     public static final String USER_REGISTERED_TOPIC = "user.registered";
+    public static final String USER_UPDATED_TOPIC = "user.updated";
 
     @Bean
     public NewTopic userRegisteredTopic() {
         return TopicBuilder.name(USER_REGISTERED_TOPIC)
+            .partitions(3)
+            .replicas(1)
+            .build();
+    }
+
+    @Bean
+    public NewTopic userUpdatedTopic() {
+        return TopicBuilder.name(USER_UPDATED_TOPIC)
             .partitions(3)
             .replicas(1)
             .build();

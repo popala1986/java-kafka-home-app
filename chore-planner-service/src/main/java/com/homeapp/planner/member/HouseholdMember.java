@@ -56,6 +56,12 @@ public class HouseholdMember {
             event.occurredAt());
     }
 
+    // Zmiana przyszła z user-auth-service (event user.updated).
+    public void updateProfile(String firstName, LocalDate birthDate) {
+        this.firstName = firstName;
+        this.birthDate = birthDate;
+    }
+
     public UUID getUserId() { return userId; }
     public UUID getHouseholdId() { return householdId; }
     public String getFirstName() { return firstName; }

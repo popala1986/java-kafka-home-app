@@ -34,14 +34,33 @@ public class UserEventPublisher {
             user.getPhoneNumber(),
             Instant.now());
 
+        send(KafkaTopicConfig.USER_REGISTERED_TOPIC, user, event);
+    }
+
+    public void publishUserUpdated(User user) {
+        UserUpdatedEvent event = new UserUpdatedEvent(
+            UUID.randomUUID(),
+            user.getId(),
+            user.getHousehold().getId(),
+            user.getFirstName(),
+            user.getBirthDate(),
+            user.getPhoneNumber(),
+            Instant.now());
+
+        send(KafkaTopicConfig.USER_UPDATED_TOPIC, user, event);
+    }
+
+    // Klucz = userId: wszystkie eventy jednej osoby lądują w tej samej partycji, więc przychodzą po kolei.
+    private void send(String topic, User user, Object event) {
         String key = user.getId().toString();
 
-        kafkaTemplate.send(KafkaTopicConfig.USER_REGISTERED_TOPIC, key, event)
+        kafkaTemplate.send(topic, key, event)
             .whenComplete((result, ex) -> {
                 if (ex != null) {
-                    log.error("Nie udało się wysłać eventu user.registered dla userId={}", key, ex);
+                    log.error("Nie udało się wysłać eventu {} dla userId={}", topic, key, ex);
                 } else {
-                    log.info("Wysłano user.registered userId={} partition={} offset={}",
+                    log.info("Wysłano {} userId={} partition={} offset={}",
+                        topic,
                         key,
                         result.getRecordMetadata().partition(),
                         result.getRecordMetadata().offset());

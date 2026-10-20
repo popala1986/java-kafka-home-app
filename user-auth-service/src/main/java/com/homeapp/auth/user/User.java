@@ -76,6 +76,13 @@ public class User {
     public Role getRole() { return role; }
     public Instant getCreatedAt() { return createdAt; }
 
+    // Admin poprawia dane domownika. Email, hasło i rola zostają bez zmian.
+    public void updateProfile(String firstName, LocalDate birthDate, String phoneNumber) {
+        this.firstName = firstName;
+        this.birthDate = birthDate;
+        this.phoneNumber = phoneNumber;
+    }
+
     public boolean canLogIn() {
         return email != null && passwordHash != null;
     }

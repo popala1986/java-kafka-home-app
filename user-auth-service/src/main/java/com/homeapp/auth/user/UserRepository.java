@@ -13,4 +13,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
 
     List<User> findAllByHouseholdIdOrderByBirthDateAsc(UUID householdId);
+
+    // Użytkownik, ale tylko z tej rodziny: obcy wygląda jak nieistniejący (404).
+    Optional<User> findByIdAndHouseholdId(UUID id, UUID householdId);
 }

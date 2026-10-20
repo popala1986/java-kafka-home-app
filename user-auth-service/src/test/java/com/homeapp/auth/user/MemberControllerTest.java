@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -112,5 +113,51 @@ class MemberControllerTest {
                 .content(body))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errors.loginDataComplete").exists());
+    }
+
+    @Test
+    void adminShouldUpdateMember() throws Exception {
+        UUID olaId = UUID.randomUUID();
+        UserResponse response = new UserResponse(
+            olaId, HOUSEHOLD_ID, null, "Ola",
+            LocalDate.of(2012, 4, 30), null, Role.USER, false, Instant.now());
+        given(userService.updateMember(eq(HOUSEHOLD_ID), eq(olaId), any())).willReturn(response);
+
+        mockMvc.perform(put("/api/households/me/members/" + olaId)
+                .with(loggedInAs("ADMIN"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "firstName": "Ola",
+                      "birthDate": "2012-04-30"
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.birthDate").value("2012-04-30"));
+    }
+
+    @Test
+    void userShouldNotUpdateMember() throws Exception {
+        mockMvc.perform(put("/api/households/me/members/" + UUID.randomUUID())
+                .with(loggedInAs("USER"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(ZOSIA))
+            .andExpect(status().isForbidden());
+
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingWithoutFirstName() throws Exception {
+        mockMvc.perform(put("/api/households/me/members/" + UUID.randomUUID())
+                .with(loggedInAs("ADMIN"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "birthDate": "2012-04-30"
+                    }
+                    """))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errors.firstName").exists());
     }
 }
