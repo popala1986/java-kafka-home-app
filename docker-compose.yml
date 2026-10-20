@@ -29,6 +29,10 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_NUM_PARTITIONS: 3
       KAFKA_HEAP_OPTS: "-Xms256m -Xmx512m"
+      # Gdzie Kafka trzyma dane (topiki, wiadomości, offsety grup). Ten katalog jest na wolumenie poniżej.
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - kafka-data:/var/lib/kafka/data
     healthcheck:
       test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server kafka:29092 > /dev/null 2>&1"]
       interval: 10s
@@ -68,4 +72,5 @@ services:
       retries: 10
 
 volumes:
+  kafka-data:
   postgres-data:
