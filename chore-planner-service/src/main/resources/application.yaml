@@ -30,6 +30,13 @@ spring:
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
         spring.json.value.default.type: com.homeapp.planner.member.UserRegisteredEvent
         spring.json.use.type.headers: false
+    # Od Kroku 9a planner też wysyła eventy (chore.daily.digest). Ustawienia jak w user-auth-service.
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      acks: all
+      properties:
+        spring.json.add.type.headers: false
 
 app:
   jwt:
@@ -39,6 +46,8 @@ app:
     # Kiedy automat układa plan na następny tydzień: sekunda minuta godzina dzień miesiąc dzień-tygodnia.
     # Tu: w każdą niedzielę o 18:00 (strefa Europe/Warsaw).
     weekly-plan-cron: ${WEEKLY_PLAN_CRON:0 0 18 * * SUN}
+    # Poranne podsumowanie zadań: codziennie o 6:30.
+    daily-digest-cron: ${DAILY_DIGEST_CRON:0 30 6 * * *}
 
 management:
   endpoints:
