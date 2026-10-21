@@ -35,10 +35,16 @@ async function request(path, options = {}) {
   if (response.status === 401 && token) {
     throw new UnauthorizedError('Sesja wygasła, zaloguj się ponownie.')
   }
+  // 403 = jesteś zalogowany, ale ta akcja jest tylko dla rodzica (hasRole("ADMIN") w SecurityConfig).
+  if (response.status === 403) {
+    throw new Error('Tę akcję może wykonać tylko rodzic.')
+  }
   if (!response.ok) {
     // Nasze serwisy zwracają błędy w formacie ProblemDetail: { "detail": "...", "status": ... }.
+    // Przy błędzie walidacji jest też "errors": { "firstName": "Imię jest wymagane", ... }.
     const problem = await response.json().catch(() => null)
-    throw new Error(problem?.detail ?? `Błąd ${response.status}`)
+    const fieldErrors = problem?.errors ? Object.values(problem.errors).join(', ') : null
+    throw new Error(fieldErrors ?? problem?.detail ?? `Błąd ${response.status}`)
   }
   if (response.status === 204) {
     return null
@@ -60,4 +66,42 @@ export function getMe() {
 
 export function getMyPlan(weekStart) {
   return request(`/api/planner/plans/${weekStart}/me`)
+}
+
+// ----- Panel rodzica (Krok 13a) -----
+
+export function getFamilyPlan(weekStart) {
+  return request(`/api/planner/plans/${weekStart}`)
+}
+
+export function generatePlan(weekStart) {
+  return request(`/api/planner/plans/${weekStart}`, { method: 'POST' })
+}
+
+export function deletePlan(weekStart) {
+  return request(`/api/planner/plans/${weekStart}`, { method: 'DELETE' })
+}
+
+export function reassign(weekStart, assignmentId, userId) {
+  return request(`/api/planner/plans/${weekStart}/assignments/${assignmentId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ userId }),
+  })
+}
+
+// Domownicy, których zna planner (dostał ich przez Kafkę). Z nich wybieramy, kto ma zrobić zadanie.
+export function getPlannerMembers() {
+  return request('/api/planner/households/me/members')
+}
+
+// Domownicy z user-auth-service: tu są e-maile i informacja, kto może się logować.
+export function getMembers() {
+  return request('/api/households/me/members')
+}
+
+export function addMember(member) {
+  return request('/api/households/me/members', {
+    method: 'POST',
+    body: JSON.stringify(member),
+  })
 }
