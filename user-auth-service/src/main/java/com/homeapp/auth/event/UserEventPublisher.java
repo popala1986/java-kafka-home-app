@@ -54,6 +54,9 @@ public class UserEventPublisher {
     // Klucz = userId: wszystkie eventy jednej osoby lądują w tej samej partycji, więc przychodzą po kolei.
     private void send(String topic, User user, Object event) {
         String key = user.getId().toString();
+        // Ta linijka powstaje w wątku zapytania HTTP, więc ma w logu correlationId.
+        // "Wysłano ..." niżej pisze już wątek Kafki, który nie zna naszego MDC, dlatego tam jest [-].
+        log.info("Wysyłam {} userId={}", topic, key);
 
         kafkaTemplate.send(topic, key, event)
             .whenComplete((result, ex) -> {
