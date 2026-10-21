@@ -29,3 +29,9 @@ export function dayLabel(date) {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   return `${weekday} ${day}.${month}`
 }
+
+// "2012-04-30" -> "30.04.2012"
+export function formatIsoDate(iso) {
+  const [year, month, day] = iso.split('-')
+  return `${day}.${month}.${year}`
+}

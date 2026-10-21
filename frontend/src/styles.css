@@ -34,7 +34,9 @@ body { margin: 0; background: var(--bg); }
 }
 
 h1 { font-size: 1.5rem; text-align: center; }
-h2 { font-size: 1rem; margin: 0 0 8px; text-transform: capitalize; }
+h2 { font-size: 1rem; margin: 0 0 8px; }
+/* Tylko pierwsza litera wielka: "Poniedziałek 26.10", "Dodaj domownika". */
+h2::first-letter { text-transform: uppercase; }
 
 .card {
   background: var(--card);
@@ -92,3 +94,36 @@ li:first-child { border-top: none; }
 
 .muted { color: var(--muted); }
 .error { color: var(--error); }
+
+/* ----- Krok 13a: zakładki i panel rodzica ----- */
+:root { --success: #2e7d32; }
+@media (prefers-color-scheme: dark) {
+  :root { --success: #81c995; }
+}
+
+.tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.tabs button {
+  flex: 1;
+  padding: 10px 4px;
+  font-size: 0.9rem;
+  background: var(--card);
+  color: var(--text);
+}
+.tabs button.active { background: var(--accent); color: #fff; }
+
+li { align-items: center; }
+select {
+  max-width: 45%;
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid var(--muted);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+label.checkbox { display: flex; align-items: center; gap: 8px; }
+label.checkbox input { width: auto; margin: 0; }
+
+button.danger { width: 100%; background: var(--error); }
+.success { color: var(--success); }

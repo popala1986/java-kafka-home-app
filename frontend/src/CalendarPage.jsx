@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getMe, getMyPlan, UnauthorizedError } from './api.js'
+import { getMyPlan, UnauthorizedError } from './api.js'
 import { addDays, dayLabel, mondayOf, toIsoDate } from './dates.js'
+import WeekNav from './WeekNav.jsx'
 
-// "Mój kalendarz": zadania zalogowanej osoby na wybrany tydzień, dzień po dniu.
-export default function CalendarPage({ onLogout, onUnauthorized }) {
-  const [me, setMe] = useState(null)
+// "Mój tydzień": zadania zalogowanej osoby na wybrany tydzień, dzień po dniu.
+export default function CalendarPage({ onUnauthorized }) {
   const [weekStart, setWeekStart] = useState(() => mondayOf(new Date()))
   const [assignments, setAssignments] = useState([])
   const [loading, setLoading] = useState(true)
@@ -15,12 +15,6 @@ export default function CalendarPage({ onLogout, onUnauthorized }) {
     (e) => (e instanceof UnauthorizedError ? onUnauthorized(e) : setError(e.message)),
     [onUnauthorized],
   )
-
-  // useEffect = "zrób to po narysowaniu ekranu". Tablica na końcu mówi, kiedy powtórzyć.
-  // Tu tylko raz, przy pierwszym wejściu (handleError się nie zmienia).
-  useEffect(() => {
-    getMe().then(setMe).catch(handleError)
-  }, [handleError])
 
   // [weekStart] = za każdym razem, gdy zmieni się tydzień (strzałki), pobierz plan od nowa.
   useEffect(() => {
@@ -37,17 +31,8 @@ export default function CalendarPage({ onLogout, onUnauthorized }) {
   const totalPoints = assignments.reduce((sum, a) => sum + a.points, 0)
 
   return (
-    <main className="page">
-      <header className="topbar">
-        <span>Cześć, {me ? me.firstName : '…'}!</span>
-        <button className="link" onClick={onLogout}>Wyloguj</button>
-      </header>
-
-      <nav className="week-nav">
-        <button onClick={() => setWeekStart(addDays(weekStart, -7))} aria-label="Poprzedni tydzień">‹</button>
-        <strong>Tydzień od {dayLabel(weekStart)}</strong>
-        <button onClick={() => setWeekStart(addDays(weekStart, 7))} aria-label="Następny tydzień">›</button>
-      </nav>
+    <>
+      <WeekNav weekStart={weekStart} onChange={setWeekStart} />
 
       {loading && <p className="muted">Ładuję…</p>}
       {error && <p className="error">{error}</p>}
@@ -81,6 +66,6 @@ export default function CalendarPage({ onLogout, onUnauthorized }) {
           })}
         </>
       )}
-    </main>
+    </>
   )
 }
