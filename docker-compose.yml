@@ -53,6 +53,15 @@ services:
       kafka:
         condition: service_healthy
 
+  # Testowa skrzynka pocztowa: łapie wszystkie maile z aplikacji, nic nie wychodzi do internetu.
+  # Podgląd w przeglądarce: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.31.3
+    container_name: mailpit
+    ports:
+      - "1025:1025"   # SMTP: tu notification-service wysyła maile
+      - "8025:8025"   # strona WWW ze skrzynką
+
   postgres:
     image: postgres:17-alpine
     container_name: postgres
