@@ -37,6 +37,8 @@ spring:
       acks: all
       properties:
         spring.json.add.type.headers: false
+        # Dopisuje nagłówek correlationId do każdej wysyłanej wiadomości (Krok 10b).
+        interceptor.classes: com.homeapp.planner.correlation.CorrelationIdProducerInterceptor
 
 app:
   jwt:
@@ -48,6 +50,11 @@ app:
     weekly-plan-cron: ${WEEKLY_PLAN_CRON:0 0 18 * * SUN}
     # Poranne podsumowanie zadań: codziennie o 6:30.
     daily-digest-cron: ${DAILY_DIGEST_CRON:0 30 6 * * *}
+
+logging:
+  pattern:
+    # W każdej linijce logu, przed nazwą klasy: [correlationId] albo [-], gdy go nie ma.
+    correlation: "[%X{correlationId:--}] "
 
 management:
   endpoints:

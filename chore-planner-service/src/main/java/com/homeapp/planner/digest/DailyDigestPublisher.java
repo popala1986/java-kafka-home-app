@@ -21,6 +21,8 @@ public class DailyDigestPublisher {
     // Klucz = userId, tak jak w auth: eventy jednej osoby trafiają do jednej partycji.
     public void publish(DailyDigestEvent event) {
         String key = event.userId().toString();
+        // Jak w auth: ta linijka ma correlationId, a "Wysłano ..." (wątek Kafki) już nie.
+        log.info("Wysyłam chore.daily.digest dla {} na {}", event.firstName(), event.date());
 
         kafkaTemplate.send(KafkaTopicConfig.DAILY_DIGEST_TOPIC, key, event)
             .whenComplete((result, ex) -> {

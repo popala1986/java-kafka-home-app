@@ -50,6 +50,11 @@ app:
   notification:
     mail-from: ${MAIL_FROM:Domowe obowiązki <no-reply@home-app.local>}
 
+logging:
+  pattern:
+    # W każdej linijce logu, przed nazwą klasy: [correlationId] albo [-], gdy go nie ma.
+    correlation: "[%X{correlationId:--}] "
+
 management:
   endpoints:
     web:

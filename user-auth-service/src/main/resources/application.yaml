@@ -27,12 +27,19 @@ spring:
       acks: all
       properties:
         spring.json.add.type.headers: false
+        # Dopisuje nagłówek correlationId do każdej wysyłanej wiadomości (Krok 10b).
+        interceptor.classes: com.homeapp.auth.correlation.CorrelationIdProducerInterceptor
 
 app:
   jwt:
     # Lokalnie działa wartość domyślna. Na serwerze podamy prawdziwy sekret w zmiennej JWT_SECRET.
     secret: ${JWT_SECRET:local-dev-secret-change-me-at-least-32-bytes-long}
     expiration: ${JWT_EXPIRATION:PT1H}
+
+logging:
+  pattern:
+    # W każdej linijce logu, przed nazwą klasy: [correlationId] albo [-], gdy go nie ma.
+    correlation: "[%X{correlationId:--}] "
 
 management:
   endpoints:
