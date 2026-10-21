@@ -8,11 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.context.annotation.Import;
 
-// Test na prawdziwej bazie z Dockera (replace = NONE), z migracjami Flyway.
+import com.homeapp.planner.TestcontainersConfig;
+
+// Test na prawdziwym Postgresie z Testcontainers (replace = NONE = nie podmieniaj na bazę w pamięci), z migracjami Flyway.
 // @DataJpaTest robi rollback po każdym teście, więc nic nie zostaje w bazie.
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestcontainersConfig.class)
 class ChoreRepositoryTest {
 
     @Autowired
