@@ -1,0 +1,4 @@
+# Pobrane biblioteki (npm install odtworzy je z package-lock.json)
+node_modules/
+# Zbudowana wersja (npm run build)
+dist/
