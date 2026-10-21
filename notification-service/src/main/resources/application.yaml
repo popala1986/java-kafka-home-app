@@ -31,6 +31,13 @@ spring:
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
         spring.json.use.type.headers: false
         # Typ (klasę) eventu każdy @KafkaListener podaje sam, bo tu są trzy różne topiki.
+    # Od Kroku 10 serwis też wysyła do Kafki: eventy, których nie dało się obsłużyć, idą do DLT.
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      acks: all
+      properties:
+        spring.json.add.type.headers: false
 
   # Lokalnie maile łapie Mailpit z docker-compose (podgląd: http://localhost:8025).
   mail:
