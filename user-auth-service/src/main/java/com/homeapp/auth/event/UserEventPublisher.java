@@ -43,6 +43,7 @@ public class UserEventPublisher {
             user.getId(),
             user.getHousehold().getId(),
             user.getFirstName(),
+            user.getEmail(),
             user.getBirthDate(),
             user.getPhoneNumber(),
             Instant.now());
