@@ -105,3 +105,7 @@ export function addMember(member) {
     body: JSON.stringify(member),
   })
 }
+
+export function deleteMember(userId) {
+  return request(`/api/households/me/members/${userId}`, { method: 'DELETE' })
+}

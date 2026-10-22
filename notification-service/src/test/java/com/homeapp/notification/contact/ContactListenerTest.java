@@ -61,4 +61,22 @@ class ContactListenerTest {
         assertThat(ola.getFirstName()).isEqualTo("Ola");
         verify(repository, never()).save(any());
     }
+
+    @Test
+    void shouldDeleteContactOfDeletedUser() {
+        given(repository.existsById(OLA)).willReturn(true);
+
+        listener.onUserDeleted(new UserDeletedEvent(UUID.randomUUID(), OLA, HOUSEHOLD_ID, MONDAY));
+
+        verify(repository).deleteById(OLA);
+    }
+
+    @Test
+    void shouldSkipDeleteOfUnknownContact() {
+        given(repository.existsById(OLA)).willReturn(false);
+
+        listener.onUserDeleted(new UserDeletedEvent(UUID.randomUUID(), OLA, HOUSEHOLD_ID, MONDAY));
+
+        verify(repository, never()).deleteById(any());
+    }
 }

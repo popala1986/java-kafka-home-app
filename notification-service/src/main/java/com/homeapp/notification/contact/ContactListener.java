@@ -43,6 +43,19 @@ public class ContactListener {
             event.occurredAt());
     }
 
+    // Usunięta osoba nie powinna dostawać już maili, a jej dane nie powinny tu zostać.
+    @KafkaListener(
+        topics = "user.deleted",
+        properties = "spring.json.value.default.type=com.homeapp.notification.contact.UserDeletedEvent")
+    public void onUserDeleted(@Payload UserDeletedEvent event) {
+        if (!contactRepository.existsById(event.userId())) {
+            log.info("Brak kontaktu userId={}, nie ma czego usuwać", event.userId());
+            return;
+        }
+        contactRepository.deleteById(event.userId());
+        log.info("Usunięto kontakt userId={}", event.userId());
+    }
+
     private void save(UUID userId, UUID householdId, String firstName, String email, String phoneNumber,
                       Instant occurredAt) {
         Contact contact = contactRepository.findById(userId).orElse(null);

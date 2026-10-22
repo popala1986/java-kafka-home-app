@@ -127,3 +127,5 @@ label.checkbox input { width: auto; margin: 0; }
 
 button.danger { width: 100%; background: var(--error); }
 .success { color: var(--success); }
+
+button.link.danger-link { color: var(--error); padding: 4px 0 4px 12px; }

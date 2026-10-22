@@ -86,6 +86,19 @@ public class UserService {
         return UserResponse.from(member);
     }
 
+    /** Admin usuwa domownika ze swojej rodziny. Rodzica (ADMIN) usunąć się nie da. */
+    @Transactional
+    public void deleteMember(UUID householdId, UUID userId) {
+        User member = userRepository.findByIdAndHouseholdId(userId, householdId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        if (member.getRole() == Role.ADMIN) {
+            throw new CannotDeleteAdminException();
+        }
+
+        userRepository.delete(member);
+        userEventPublisher.publishUserDeleted(member);
+    }
+
     @Transactional(readOnly = true)
     public List<UserResponse> listMembers(UUID householdId) {
         if (!householdRepository.existsById(householdId)) {
