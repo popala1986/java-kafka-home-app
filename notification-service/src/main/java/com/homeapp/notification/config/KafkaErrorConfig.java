@@ -76,6 +76,7 @@ public class KafkaErrorConfig {
         return new KafkaAdmin.NewTopics(
             deadLetter("user.registered"),
             deadLetter("user.updated"),
+            deadLetter("user.deleted"),
             deadLetter("chore.daily.digest"));
     }
 

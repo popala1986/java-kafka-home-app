@@ -51,6 +51,16 @@ public class UserEventPublisher {
         send(KafkaTopicConfig.USER_UPDATED_TOPIC, user, event);
     }
 
+    public void publishUserDeleted(User user) {
+        UserDeletedEvent event = new UserDeletedEvent(
+            UUID.randomUUID(),
+            user.getId(),
+            user.getHousehold().getId(),
+            Instant.now());
+
+        send(KafkaTopicConfig.USER_DELETED_TOPIC, user, event);
+    }
+
     // Klucz = userId: wszystkie eventy jednej osoby lądują w tej samej partycji, więc przychodzą po kolei.
     private void send(String topic, User user, Object event) {
         String key = user.getId().toString();

@@ -13,6 +13,7 @@ import com.homeapp.auth.household.HouseholdNotFoundException;
 import com.homeapp.auth.security.InvalidCredentialsException;
 import com.homeapp.auth.user.EmailAlreadyTakenException;
 import com.homeapp.auth.user.UserNotFoundException;
+import com.homeapp.auth.user.CannotDeleteAdminException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -34,6 +35,13 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleEmailTaken(EmailAlreadyTakenException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
         problem.setTitle("Email zajęty");
+        return problem;
+    }
+
+    @ExceptionHandler(CannotDeleteAdminException.class)
+    public ProblemDetail handleCannotDeleteAdmin(CannotDeleteAdminException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Nie można usunąć");
         return problem;
     }
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { addMember, getMembers, UnauthorizedError } from './api.js'
+import { addMember, deleteMember, getMembers, UnauthorizedError } from './api.js'
 import { formatIsoDate } from './dates.js'
 
 const EMPTY_FORM = { firstName: '', birthDate: '', canLogIn: false, email: '', password: '' }
@@ -53,8 +53,27 @@ export default function MembersPage({ onUnauthorized }) {
     }
   }
 
+  async function handleDelete(member) {
+    if (!window.confirm(`Usunąć domownika ${member.firstName}? Zadania tej osoby znikną z planów.`)) {
+      return
+    }
+    setError(null)
+    setSuccess(null)
+    try {
+      await deleteMember(member.id)
+      setSuccess(`Usunięto: ${member.firstName}. Planner i powiadomienia dostaną to przez Kafkę.`)
+      loadMembers()
+    } catch (e) {
+      handleError(e)
+    }
+  }
+
   return (
     <>
+      {/* Komunikaty na górze, żeby było je widać i po dodaniu, i po usunięciu. */}
+      {error && <p className="error">{error}</p>}
+      {success && <p className="success">{success}</p>}
+
       <section className="card">
         <h2>Rodzina</h2>
         <ul>
@@ -66,6 +85,13 @@ export default function MembersPage({ onUnauthorized }) {
               </span>
               <span className="points">
                 {member.role === 'ADMIN' ? 'rodzic' : member.canLogIn ? 'ma konto' : 'bez konta'}
+                {/* Rodzica usunąć się nie da (backend odpowie 409), więc przycisku przy nim nie ma. */}
+                {member.role !== 'ADMIN' && (
+                  <button className="link danger-link" onClick={() => handleDelete(member)}
+                          aria-label={`Usuń ${member.firstName}`}>
+                    Usuń
+                  </button>
+                )}
               </span>
             </li>
           ))}
@@ -103,8 +129,6 @@ export default function MembersPage({ onUnauthorized }) {
             </label>
           </>
         )}
-        {error && <p className="error">{error}</p>}
-        {success && <p className="success">{success}</p>}
         <button type="submit" disabled={saving}>{saving ? 'Zapisuję…' : 'Dodaj'}</button>
       </form>
     </>

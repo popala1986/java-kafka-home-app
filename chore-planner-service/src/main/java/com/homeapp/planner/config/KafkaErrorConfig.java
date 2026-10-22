@@ -75,7 +75,8 @@ public class KafkaErrorConfig {
     public KafkaAdmin.NewTopics deadLetterTopics() {
         return new KafkaAdmin.NewTopics(
             deadLetter("user.registered"),
-            deadLetter("user.updated"));
+            deadLetter("user.updated"),
+            deadLetter("user.deleted"));
     }
 
     private static NewTopic deadLetter(String topic) {

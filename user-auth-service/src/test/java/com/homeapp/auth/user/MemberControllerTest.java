@@ -3,6 +3,9 @@ package com.homeapp.auth.user;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -159,5 +162,33 @@ class MemberControllerTest {
                     """))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errors.firstName").exists());
+    }
+
+    @Test
+    void adminShouldDeleteMember() throws Exception {
+        UUID zosiaId = UUID.randomUUID();
+
+        mockMvc.perform(delete("/api/households/me/members/" + zosiaId).with(loggedInAs("ADMIN")))
+            .andExpect(status().isNoContent());
+
+        verify(userService).deleteMember(HOUSEHOLD_ID, zosiaId);
+    }
+
+    @Test
+    void userShouldNotDeleteMember() throws Exception {
+        mockMvc.perform(delete("/api/households/me/members/" + UUID.randomUUID()).with(loggedInAs("USER")))
+            .andExpect(status().isForbidden());
+
+        verifyNoInteractions(userService);
+    }
+
+    @Test
+    void shouldReturn409WhenDeletingAdmin() throws Exception {
+        UUID adminId = UUID.randomUUID();
+        willThrow(new CannotDeleteAdminException()).given(userService).deleteMember(HOUSEHOLD_ID, adminId);
+
+        mockMvc.perform(delete("/api/households/me/members/" + adminId).with(loggedInAs("ADMIN")))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.detail").value("Nie można usunąć rodzica (konta ADMIN)"));
     }
 }

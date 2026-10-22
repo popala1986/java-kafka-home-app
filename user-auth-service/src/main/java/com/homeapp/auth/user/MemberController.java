@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import com.homeapp.auth.security.CurrentUser;
 
@@ -49,4 +50,11 @@ public class MemberController {
                                      @Valid @RequestBody UpdateMemberRequest request) {
         return userService.updateMember(CurrentUser.householdId(jwt), userId, request);
     }
+
+    @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMember(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID userId) {
+        userService.deleteMember(CurrentUser.householdId(jwt), userId);
+    }
+
 }
