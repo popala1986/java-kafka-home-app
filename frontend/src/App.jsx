@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { clearToken, getMe, getToken, UnauthorizedError } from './api.js'
 import CalendarPage from './CalendarPage.jsx'
+import ChoresPage from './ChoresPage.jsx'
 import FamilyPlanPage from './FamilyPlanPage.jsx'
 import LoginPage from './LoginPage.jsx'
 import MembersPage from './MembersPage.jsx'
@@ -9,6 +10,7 @@ import MembersPage from './MembersPage.jsx'
 const TABS = [
   { id: 'calendar', label: 'Mój tydzień', adminOnly: false },
   { id: 'family', label: 'Plan rodziny', adminOnly: true },
+  { id: 'chores', label: 'Obowiązki', adminOnly: true },
   { id: 'members', label: 'Domownicy', adminOnly: true },
 ]
 
@@ -75,6 +77,7 @@ export default function App() {
 
       {tab === 'calendar' && <CalendarPage onUnauthorized={handleUnauthorized} />}
       {isAdmin && tab === 'family' && <FamilyPlanPage onUnauthorized={handleUnauthorized} />}
+      {isAdmin && tab === 'chores' && <ChoresPage onUnauthorized={handleUnauthorized} />}
       {isAdmin && tab === 'members' && <MembersPage onUnauthorized={handleUnauthorized} />}
     </main>
   )

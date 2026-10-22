@@ -109,3 +109,35 @@ export function addMember(member) {
 export function deleteMember(userId) {
   return request(`/api/households/me/members/${userId}`, { method: 'DELETE' })
 }
+
+// ----- Obowiązki (Krok 13a3) -----
+
+export function getChores() {
+  return request('/api/planner/chores')
+}
+
+export function addChore(chore) {
+  return request('/api/planner/chores', { method: 'POST', body: JSON.stringify(chore) })
+}
+
+// PUT podmienia cały obowiązek, więc wysyłamy wszystkie pola, także te bez zmian.
+export function updateChore(choreId, chore) {
+  return request(`/api/planner/chores/${choreId}`, { method: 'PUT', body: JSON.stringify(chore) })
+}
+
+export function deleteChore(choreId) {
+  return request(`/api/planner/chores/${choreId}`, { method: 'DELETE' })
+}
+
+// Lista userId osób, które NIE robią tego obowiązku.
+export function getExclusions(choreId) {
+  return request(`/api/planner/chores/${choreId}/exclusions`)
+}
+
+export function excludeMember(choreId, userId) {
+  return request(`/api/planner/chores/${choreId}/exclusions/${userId}`, { method: 'PUT' })
+}
+
+export function includeMember(choreId, userId) {
+  return request(`/api/planner/chores/${choreId}/exclusions/${userId}`, { method: 'DELETE' })
+}
