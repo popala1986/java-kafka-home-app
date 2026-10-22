@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!-- Łagodne reguły dla całego projektu: pilnują porządku, nie stylu co do przecinka. -->
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- Wcięcia spacjami (jak w .editorconfig), nie tabulatorem -->
+    <module name="FileTabCharacter"/>
+
+    <!-- Linia nie dłuższa niż 140 znaków (importy i pakiety nie liczą się) -->
+    <module name="LineLength">
+        <property name="max" value="140"/>
+        <property name="ignorePattern" value="^(package|import) .*"/>
+    </module>
+
+    <module name="TreeWalker">
+        <!-- Importy -->
+        <module name="AvoidStarImport"/>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+
+        <!-- Czytelność -->
+        <module name="NeedBraces"/>
+        <module name="OneStatementPerLine"/>
+        <module name="EmptyStatement"/>
+        <module name="ModifierOrder"/>
+        <module name="UpperEll"/>
+        <module name="ArrayTypeStyle"/>
+
+        <!-- Nazwy -->
+        <module name="TypeName"/>
+        <module name="MethodName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="ParameterName"/>
+        <module name="ConstantName">
+            <!-- wyjątek: popularne "private static final Logger log" -->
+            <property name="format" value="^log$|^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"/>
+        </module>
+        <module name="PackageName"/>
+    </module>
+</module>
