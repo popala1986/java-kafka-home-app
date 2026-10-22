@@ -28,13 +28,13 @@ async function request(path, options = {}) {
     headers['Content-Type'] = 'application/json'
   }
 
-    let response
-    try {
-      response = await fetch(path, { ...options, headers })
-    } catch {
-      // fetch rzuca wyjątek tylko wtedy, gdy w ogóle nie dostał odpowiedzi: brak sieci albo serwer leży.
-      throw new Error('Brak połączenia z serwerem. Sprawdź internet i spróbuj ponownie.')
-    }
+  let response
+  try {
+    response = await fetch(path, { ...options, headers })
+  } catch {
+    // fetch rzuca wyjątek tylko wtedy, gdy w ogóle nie dostał odpowiedzi: brak sieci albo serwer leży.
+    throw new Error('Brak połączenia z serwerem. Sprawdź internet i spróbuj ponownie.')
+  }
 
   // 401 z tokenem = token wygasł albo jest zły. (401 bez tokenu to np. złe hasło przy logowaniu,
   // a ten błąd ma swój komunikat z backendu, więc obsługuje go kod niżej.)
