@@ -15,6 +15,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import com.homeapp.notification.push.PushSubscriptionRepository;
+
 class ContactListenerTest {
 
     private static final UUID OLA = UUID.randomUUID();
@@ -22,7 +24,8 @@ class ContactListenerTest {
     private static final Instant MONDAY = Instant.parse("2026-10-19T10:00:00Z");
 
     private final ContactRepository repository = mock(ContactRepository.class);
-    private final ContactListener listener = new ContactListener(repository);
+    private final PushSubscriptionRepository pushRepository = mock(PushSubscriptionRepository.class);
+    private final ContactListener listener = new ContactListener(repository, pushRepository);
 
     @Test
     void shouldCreateContactFromRegisteredUser() {
@@ -69,6 +72,7 @@ class ContactListenerTest {
         listener.onUserDeleted(new UserDeletedEvent(UUID.randomUUID(), OLA, HOUSEHOLD_ID, MONDAY));
 
         verify(repository).deleteById(OLA);
+        verify(pushRepository).deleteAllByUserId(OLA);
     }
 
     @Test
@@ -78,5 +82,7 @@ class ContactListenerTest {
         listener.onUserDeleted(new UserDeletedEvent(UUID.randomUUID(), OLA, HOUSEHOLD_ID, MONDAY));
 
         verify(repository, never()).deleteById(any());
+        // Urządzenia z powiadomieniami i tak usuwamy: kontakt mógł tu nigdy nie dotrzeć.
+        verify(pushRepository).deleteAllByUserId(OLA);
     }
 }

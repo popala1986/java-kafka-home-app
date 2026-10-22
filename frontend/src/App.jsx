@@ -5,6 +5,7 @@ import ChoresPage from './ChoresPage.jsx'
 import FamilyPlanPage from './FamilyPlanPage.jsx'
 import LoginPage from './LoginPage.jsx'
 import MembersPage from './MembersPage.jsx'
+import NotificationsPage from './NotificationsPage.jsx'
 
 // Zakładki u góry ekranu. adminOnly = widzi je tylko rodzic.
 const TABS = [
@@ -12,6 +13,7 @@ const TABS = [
   { id: 'family', label: 'Plan rodziny', adminOnly: true },
   { id: 'chores', label: 'Obowiązki', adminOnly: true },
   { id: 'members', label: 'Domownicy', adminOnly: true },
+  { id: 'notifications', label: 'Powiadomienia', adminOnly: false },
 ]
 
 // Główny komponent: nie ma tokenu = logowanie, jest token = górny pasek, zakładki i wybrana strona.
@@ -79,6 +81,7 @@ export default function App() {
       {isAdmin && tab === 'family' && <FamilyPlanPage onUnauthorized={handleUnauthorized} />}
       {isAdmin && tab === 'chores' && <ChoresPage onUnauthorized={handleUnauthorized} />}
       {isAdmin && tab === 'members' && <MembersPage onUnauthorized={handleUnauthorized} />}
+      {tab === 'notifications' && <NotificationsPage onUnauthorized={handleUnauthorized} />}
     </main>
   )
 }

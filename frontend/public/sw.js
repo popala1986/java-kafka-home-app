@@ -1,9 +1,9 @@
 // Service Worker: osobny skrypt, który przeglądarka trzyma obok strony i uruchamia w tle.
 // Widzi każde zapytanie strony (zdarzenie "fetch") i może odpowiedzieć z własnej pamięci (Cache).
-// W Kroku 13c ten sam plik odbierze powiadomienia push.
+// Od Kroku 13c odbiera też powiadomienia push (zdarzenie "push"), nawet gdy apka jest zamknięta.
 
 // Zmień numer, gdy zmienisz ten plik: stara pamięć zostanie wtedy wyczyszczona.
-const CACHE = 'homeapp-v2'
+const CACHE = 'homeapp-v3'
 
 // Szkielet aplikacji: zapisujemy go od razu przy instalacji, żeby działał bez sieci już po pierwszej wizycie.
 const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png']
@@ -51,5 +51,27 @@ self.addEventListener('fetch', (event) => {
         return response
       })
       .catch(() => caches.match(request).then((cached) => cached ?? caches.match('/'))),
+  )
+})
+// Powiadomienie od serwera (przez Google/Apple). Treść to JSON z notification-service: { title, body, url }.
+self.addEventListener('push', (event) => {
+  const message = event.data ? event.data.json() : {}
+  event.waitUntil(
+    self.registration.showNotification(message.title ?? 'Domowe obowiązki', {
+      body: message.body,
+      icon: '/icons/icon-192.png',
+      data: { url: message.url ?? '/' },
+    }),
+  )
+})
+
+// Kliknięcie w powiadomienie: pokaż otwartą apkę, a jeśli jest zamknięta, otwórz ją.
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+      const open = windows.find((window) => 'focus' in window)
+      return open ? open.focus() : self.clients.openWindow(event.notification.data.url)
+    }),
   )
 })

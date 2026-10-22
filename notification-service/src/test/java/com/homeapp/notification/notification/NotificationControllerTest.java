@@ -47,12 +47,12 @@ class NotificationControllerTest {
     @Test
     void adminShouldSeeHouseholdHistory() throws Exception {
         given(notificationService.history(HOUSEHOLD_ID)).willReturn(List.of(new NotificationResponse(
-            UUID.randomUUID(), UUID.randomUUID(), LocalDate.of(2026, 10, 20), Channel.SMS, "500600700",
-            NotificationStatus.SENT, "Ola, wtorek 20.10: ...", null, Instant.now())));
+            UUID.randomUUID(), UUID.randomUUID(), LocalDate.of(2026, 10, 20), Channel.PUSH, "aplikacja",
+            NotificationStatus.SENT, "Zadania: 2, razem 3 pkt. ...", null, Instant.now())));
 
         mockMvc.perform(get("/api/notifications").with(loggedInAs("ADMIN")))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].channel").value("SMS"));
+            .andExpect(jsonPath("$[0].channel").value("PUSH"));
     }
 
     @Test

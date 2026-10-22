@@ -147,3 +147,21 @@ export function excludeMember(choreId, userId) {
 export function includeMember(choreId, userId) {
   return request(`/api/planner/chores/${choreId}/exclusions/${userId}`, { method: 'DELETE' })
 }
+// ----- Powiadomienia push (Krok 13c) -----
+
+export function getPushPublicKey() {
+  return request('/api/notifications/push/public-key')
+}
+
+// subscription = to, co daje przeglądarka (subscription.toJSON()): endpoint i klucze.
+export function savePushSubscription(subscription) {
+  return request('/api/notifications/push/subscriptions', { method: 'PUT', body: JSON.stringify(subscription) })
+}
+
+export function deletePushSubscription(subscription) {
+  return request('/api/notifications/push/subscriptions', { method: 'DELETE', body: JSON.stringify(subscription) })
+}
+
+export function sendTestPush() {
+  return request('/api/notifications/push/test', { method: 'POST' })
+}
