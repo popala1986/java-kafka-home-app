@@ -9,6 +9,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import com.homeapp.notification.push.PushSubscriptionRepository;
+
 // Buduje kopię kontaktów z dwóch topików. Oba eventy robią to samo: "zapisz albo popraw" (upsert).
 // Dzięki temu user.updated wystarczy, żeby poznać osobę, której user.registered nigdy tu nie dotarł.
 @Component
@@ -17,9 +19,11 @@ public class ContactListener {
     private static final Logger log = LoggerFactory.getLogger(ContactListener.class);
 
     private final ContactRepository contactRepository;
+    private final PushSubscriptionRepository pushSubscriptionRepository;
 
-    public ContactListener(ContactRepository contactRepository) {
+    public ContactListener(ContactRepository contactRepository, PushSubscriptionRepository pushSubscriptionRepository) {
         this.contactRepository = contactRepository;
+        this.pushSubscriptionRepository = pushSubscriptionRepository;
     }
 
     @KafkaListener(
@@ -43,11 +47,13 @@ public class ContactListener {
             event.occurredAt());
     }
 
-    // Usunięta osoba nie powinna dostawać już maili, a jej dane nie powinny tu zostać.
+    // Usunięta osoba nie powinna dostawać już maili ani powiadomień, a jej dane nie powinny tu zostać.
     @KafkaListener(
         topics = "user.deleted",
         properties = "spring.json.value.default.type=com.homeapp.notification.contact.UserDeletedEvent")
     public void onUserDeleted(@Payload UserDeletedEvent event) {
+        // Urządzenia usuwamy zawsze: osoba mogła włączyć push, nawet jeśli jej kontakt tu nie dotarł.
+        pushSubscriptionRepository.deleteAllByUserId(event.userId());
         if (!contactRepository.existsById(event.userId())) {
             log.info("Brak kontaktu userId={}, nie ma czego usuwać", event.userId());
             return;

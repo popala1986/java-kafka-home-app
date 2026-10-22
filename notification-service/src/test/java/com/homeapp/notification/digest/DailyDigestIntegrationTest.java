@@ -34,6 +34,7 @@ import com.homeapp.notification.notification.NotificationStatus;
 // Test integracyjny: cała droga od wiadomości w Kafce do historii w bazie.
 // Prawdziwa Kafka i prawdziwy Postgres (Testcontainers), prawdziwe listenery i serwisy.
 // Udajemy tylko serwer pocztowy (JavaMailSender), żeby test nie potrzebował Mailpita.
+// Ola nie ma urządzeń z powiadomieniami push, więc dostaje zapasowy kanał: e-mail.
 // Healthcheck poczty (Actuator) umie sprawdzać tylko prawdziwy serwer, więc w tym teście go wyłączamy.
 @SpringBootTest(properties = "management.health.mail.enabled=false")
 @Import(TestcontainersConfig.class)
@@ -64,7 +65,7 @@ class DailyDigestIntegrationTest {
     }
 
     @Test
-    void digestFromKafkaIsSentBySmsAndEmailAndSavedInHistory() {
+    void digestFromKafkaIsSentByEmailWhenNoPushDevicesAndSavedInHistory() {
         UUID userId = UUID.randomUUID();
         UUID householdId = UUID.randomUUID();
         contactRepository.save(
@@ -83,9 +84,7 @@ class DailyDigestIntegrationTest {
         await().atMost(Duration.ofSeconds(15)).untilAsserted(() ->
             assertThat(notificationRepository.findAllByHouseholdIdOrderByCreatedAtDesc(householdId))
                 .extracting(Notification::getChannel, Notification::getStatus)
-                .containsExactlyInAnyOrder(
-                    tuple(Channel.SMS, NotificationStatus.SENT),
-                    tuple(Channel.EMAIL, NotificationStatus.SENT)));
+                .containsExactly(tuple(Channel.EMAIL, NotificationStatus.SENT)));
 
         ArgumentCaptor<SimpleMailMessage> mail = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender).send(mail.capture());

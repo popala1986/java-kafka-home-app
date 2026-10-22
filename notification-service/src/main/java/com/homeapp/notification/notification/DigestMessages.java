@@ -10,22 +10,22 @@ import com.homeapp.notification.digest.DigestTask;
 // Treść wiadomości. Osobna klasa bez Springa, więc łatwo ją przetestować i poprawiać teksty.
 public final class DigestMessages {
 
-    // Jeden SMS to 160 znaków. Dłuższy kosztuje jak dwa albo trzy (to ważne w Kroku 9c).
-    static final int SMS_MAX_LENGTH = 160;
-
     private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("EEEE d.MM", Locale.of("pl"));
 
     private DigestMessages() {
     }
 
-    // Np. "Ola, wtorek 20.10: 10 zadań (14 pkt). Pościel łóżko, Nakarm zwierzaka, ..."
-    public static String sms(DailyDigestEvent event) {
+    // Powiadomienie push: krótki tytuł i jedna linijka. Np. "Ola, Twoje zadania na wtorek 20.10"
+    public static String pushTitle(DailyDigestEvent event) {
+        return "%s, Twoje zadania na %s".formatted(event.firstName(), event.date().format(DAY));
+    }
+
+    // Np. "Zadania: 2, razem 3 pkt. Pościel łóżko, Nakarm zwierzaka". Za długi tekst telefon sam utnie.
+    public static String pushBody(DailyDigestEvent event) {
         String tasks = event.tasks().stream()
             .map(DigestTask::choreName)
             .collect(Collectors.joining(", "));
-        String text = "%s, %s: %d zadań (%d pkt). %s".formatted(
-            event.firstName(), event.date().format(DAY), event.tasks().size(), event.totalPoints(), tasks);
-        return text.length() <= SMS_MAX_LENGTH ? text : text.substring(0, SMS_MAX_LENGTH - 1) + "…";
+        return "Zadania: %d, razem %d pkt. %s".formatted(event.tasks().size(), event.totalPoints(), tasks);
     }
 
     public static String emailSubject(DailyDigestEvent event) {
