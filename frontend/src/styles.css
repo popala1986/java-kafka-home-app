@@ -101,9 +101,10 @@ li:first-child { border-top: none; }
   :root { --success: #81c995; }
 }
 
-.tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .tabs button {
-  flex: 1;
+  /* Cztery zakładki nie mieszczą się w jednym rzędzie na telefonie, więc są dwie na rząd. */
+  flex: 1 1 40%;
   padding: 10px 4px;
   font-size: 0.9rem;
   background: var(--card);
@@ -129,3 +130,22 @@ button.danger { width: 100%; background: var(--error); }
 .success { color: var(--success); }
 
 button.link.danger-link { color: var(--error); padding: 4px 0 4px 12px; }
+
+/* ----- Krok 13a3: obowiązki ----- */
+button.full { width: 100%; margin-bottom: 12px; }
+button.secondary { background: var(--card); color: var(--text); border: 1px solid var(--muted); }
+
+li.chore { display: block; }
+li.chore.inactive .chore-head { opacity: 0.5; }
+.chore-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.chore-head label.checkbox { flex: 1; min-width: 0; margin: 0; align-items: flex-start; }
+.chore-meta { display: block; color: var(--muted); font-size: 0.85rem; }
+.chore-head label.checkbox input { margin-top: 3px; }
+.chore-edit { margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgb(127 127 127 / 0.4); }
+.chore-edit h2 { margin-top: 16px; }
+
+.chore-form select { display: block; width: 100%; max-width: none; margin-top: 4px; }
+.chore-form .row { display: flex; gap: 8px; }
+.chore-form .row label { flex: 1; }
+.actions { display: flex; gap: 8px; }
+.actions button { flex: 1; }
