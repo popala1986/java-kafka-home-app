@@ -80,6 +80,29 @@ services:
       timeout: 5s
       retries: 10
 
+  # Jedno wejście do aplikacji przez HTTPS (Krok 13b): frontend z frontend/dist + /api/... do serwisów.
+  # Najpierw zbuduj frontend: cd frontend, npm run build. Adres: https://localhost
+  caddy:
+    image: caddy:2.11.6-alpine
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./frontend/dist:/srv:ro
+      # Tu Caddy trzyma swój lokalny urząd certyfikacji i certyfikaty. Bez wolumenu po restarcie
+      # powstałby nowy urząd i telefon musiałby mu zaufać od nowa.
+      - caddy-data:/data
+    environment:
+      # Adres IP komputera w sieci Wi-Fi (z .env). Na niego wystawiamy certyfikat dla telefonu.
+      LAN_IP: ${LAN_IP}
+    extra_hosts:
+      # Na Windows/Mac Docker Desktop zna ten adres sam; ta linijka dodaje go też na Linuksie.
+      - "host.docker.internal:host-gateway"
+
+
 volumes:
   kafka-data:
   postgres-data:
+  caddy-data:

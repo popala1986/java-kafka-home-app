@@ -9,3 +9,19 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+// Service Worker rejestrujemy tylko w wersji zbudowanej (npm run build, serwowanej przez Caddy).
+// W npm run dev by przeszkadzał: podsuwałby stare pliki z pamięci zamiast świeżych.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .catch((error) => console.error('Nie udało się zarejestrować Service Workera', error))
+  })
+}
+// Service Worker rejestrujemy tylko w wersji zbudowanej (npm run build, serwowanej przez Caddy).
+// W npm run dev by przeszkadzał: podsuwałby stare pliki z pamięci zamiast świeżych.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .catch((error) => console.error('Nie udało się zarejestrować Service Workera', error))
+  })
+}
