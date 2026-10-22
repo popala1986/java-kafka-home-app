@@ -1,0 +1,57 @@
+# Caddy: jedno wejście do całej aplikacji (Krok 13b).
+# - serwuje zbudowany frontend (frontend/dist),
+# - przekazuje /api/... do serwisów uruchomionych w IntelliJ (jak proxy w Vite),
+# - sam wystawia certyfikat HTTPS ze swojego lokalnego "urzędu certyfikacji" (tls internal).
+
+# Ustawienia globalne.
+{
+	# Gdy telefon wchodzi przez adres IP, nie podaje nazwy serwera (SNI), bo to nie jest nazwa.
+	# Wtedy Caddy pokaże certyfikat dla tego adresu.
+	default_sni {$LAN_IP}
+	# Przekierowanie http -> https robimy sami na dole pliku, bo jeden adres http (certyfikat) ma zostać na http.
+	auto_https disable_redirects
+}
+
+# Dwa adresy: localhost (komputer) i adres komputera w domowej sieci (telefon). LAN_IP jest w pliku .env.
+# tls internal = certyfikat z lokalnego urzędu certyfikacji Caddy, bez internetu i bez domeny.
+https://localhost, https://{$LAN_IP} {
+	tls internal
+	encode gzip
+
+	# host.docker.internal = "komputer, na którym działa Docker", czyli Twoje serwisy z IntelliJ.
+	handle /api/auth/* {
+		reverse_proxy host.docker.internal:8081
+	}
+	handle /api/households/* {
+		reverse_proxy host.docker.internal:8081
+	}
+	handle /api/planner/* {
+		reverse_proxy host.docker.internal:8082
+	}
+	handle /api/notifications* {
+		reverse_proxy host.docker.internal:8083
+	}
+
+	# Cała reszta to frontend. Nieznana ścieżka dostaje index.html, a resztą zajmuje się React.
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+# Zwykłe http:// (bez szyfrowania).
+http:// {
+	# Stąd telefon pobiera certyfikat urzędu Caddy, żeby mu zaufać (13b.7).
+	# To publiczna część certyfikatu, a nie sekret: klucz prywatny zostaje w kontenerze.
+	handle /caddy-root.crt {
+		root * /data/caddy/pki/authorities/local
+		rewrite * /root.crt
+		header Content-Type application/x-x509-ca-cert
+		file_server
+	}
+	# Wszystko inne przekierowujemy na https://.
+	handle {
+		redir https://{host}{uri} permanent
+	}
+}
